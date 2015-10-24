@@ -41,6 +41,16 @@ public class PalantiriManager {
         // Semaphore to use a "fair" implementation that mediates
         // concurrent access to the given Palantiri.
         // TODO -- you fill in here.
+        
+        // Initialize palantiri map.
+        mPalantiriMap = new ConcurrentHashMap<>();
+        
+        for (Palantir pal : palantiri) {
+            mPalantiriMap.put(pal, true);
+        }
+        
+        // Initialize semaphore to fair.
+        mAvailablePalantiri = new Semaphore(palantiri.size(), true);
     }
 
     /**
@@ -56,7 +66,18 @@ public class PalantiriManager {
         // and then return that palantir to the client.  There should
         // be *no* synchronized statements in this method.
         // TODO -- you fill in here.
-
+        
+        // Acquire semaphore.
+        mAvailablePalantiri.acquireUninterruptibly();
+        
+        // Find first available palantir.
+        for (Palantir pal : mPalantiriMap.keySet()) {
+            if (mPalantiriMap.get(pal)) { // if this palantir is available.
+                mPalantiriMap.put(pal, false);
+                return pal;
+            }
+        }
+        
         // This shouldn't happen, but we need this here to make the
         // compiler happy.
         return null; 
@@ -72,6 +93,13 @@ public class PalantiriManager {
         // properly.  There should be *no* synchronized statements in
         // this method.
         // TODO -- you fill in here.
+        
+        // Free this palantir.
+        mPalantiriMap.put(palantir, true);
+        
+        // Release the semaphore.
+        mAvailablePalantiri.release();
+        
     }
 
     /*
