@@ -1,9 +1,15 @@
 package vandy.mooc.model;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.lang.ref.WeakReference;
 
 import vandy.mooc.MVP;
+import vandy.mooc.common.DownloadUtils;
+import vandy.mooc.common.Utils;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
 import android.net.Uri;
 
 /**
@@ -75,6 +81,6 @@ public class ImageDownloadsModel
                              Uri url,
                              Uri directoryPathname) {
         // @@ TODO -- You fill in here, replacing "null" with the appropriate code.
-    	return null;
+        return DownloadUtils.downloadImage(context, url, directoryPathname);
     }
 }

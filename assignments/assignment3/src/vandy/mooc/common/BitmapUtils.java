@@ -284,6 +284,11 @@ public class BitmapUtils {
         }
     }
     
+    public static boolean deleteImageFromSDCard(String filePathToDelete) {
+        File file = new File(filePathToDelete);
+        return file.delete();
+    }
+    
     /**
      * Ensure this class is only used as a utility.
      */

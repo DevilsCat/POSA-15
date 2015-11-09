@@ -5,6 +5,7 @@ import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.concurrent.Executor;
 
 import vandy.mooc.MVP;
 import vandy.mooc.common.GenericPresenter;
@@ -56,6 +57,13 @@ public class ImagePresenter
      */
     private ArrayList<Uri> mUrlList;
 
+    /**
+     * A thread pool object to run the image operations include downloading
+     * and processing.
+     */
+    private final Executor mImageOpsThreadPoolExecutor = 
+            ImageOpsThreadPool.IMAGE_OPS_THREAD_POOL_EXECUTOR;
+    
     /**
      * Constructor will choose either the Started Service or Bound
      * Service implementation of ImagePresenter.
@@ -197,6 +205,10 @@ public class ImagePresenter
             // executeOnExecutor().
 
             // TODO -- you fill in here.
+            for (Uri url : mUrlList) {
+                new ImageDownloadAsyncTask(this)
+                    .executeOnExecutor(mImageOpsThreadPoolExecutor, url);
+            }
         }
     }
 
@@ -211,7 +223,7 @@ public class ImagePresenter
         // whether this result succeeded or failed to download and
         // image.
         ++mNumImagesHandled;
-
+        Log.d(TAG, "Process Completed!");
         if (pathToImageFile == null)
             // Handle a failed download.
             mView.get().reportDownloadFailure
@@ -339,4 +351,19 @@ public class ImagePresenter
     public Context getApplicationContext() {
         return mView.get().getApplicationContext();
     }
+    
+    /**
+     * @return the instance of image operation thread pool executor.
+     */
+    public Executor getImageOpsThreadPoolExecutor() {
+        return mImageOpsThreadPoolExecutor;
+    }
+    
+    /**
+     * @return the directory pathname of writing/reading downloaded/processed image.
+     */
+    public Uri getDirectoryPathname() {
+        return mDirectoryPathname;
+    }
+    
 }
